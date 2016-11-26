@@ -1778,14 +1778,6 @@
         Bridge?  See ovs-vsctl(8) for more information.
       </column>
 
-      <column name="protected" type='{"type": "boolean"}'>
-        The protected ports feature allows certain ports to be designated as
-        protected. Traffic between protected ports is blocked. Protected
-        ports can send traffic to unprotected ports. Unprotected ports can
-        send traffic to any port.
-        Default is false.
-      </column>
-
       <column name="external_ids" key="fake-bridge-id-*">
         External IDs for a fake bridge (see the <ref column="fake_bridge"/>
         column) are defined by prefixing a <ref table="Bridge"/> <ref
@@ -2039,6 +2031,22 @@
               switching.  As such, they are always excluded from packet
               flooding.
             </p>
+          </dd>
+
+          <dt><code>gtp</code></dt>
+          <dd>
+              GPRS Tunneling Protocol (GTP) is a group of IP-based communications
+              protocols used to carry general packet radio service (GPRS) within GSM,
+              UMTS and LTE networks.GTP-U is used for carrying user data within the GPRS
+              core network and between the radio access network and the core network.
+              The user data transported can be packets in any of IPv4, IPv6, or PPP
+              formats.
+              The protocol is documented at
+              http://www.3gpp.org/DynaReport/29281.htm
+
+              Open vSwitch uses UDP destination port 2152.  The source port used for
+              GTP traffic varies on a per-flow basis and is in the ephemeral port
+              range.
           </dd>
 
           <dt><code>stt</code></dt>
