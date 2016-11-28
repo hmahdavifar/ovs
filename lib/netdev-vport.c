@@ -95,7 +95,7 @@ netdev_vport_is_patch(const struct netdev *netdev)
 }
 
 bool
-netdev_vport_is_layer3(const struct netdev *dev)
+netdev_vport_is_IP(const struct netdev *dev)
 {
     const char *type = netdev_get_type(dev);
 
