@@ -62,10 +62,16 @@ Setting up the GTP port
 ---------------------
 
 ovs-vsctl add-br br1
+
+
 # flow based tunneling port
+
 ovs-vsctl add-port br1 gtp0 -- set interface gtp0 type=gtp options:remote_ip=flow options:key=flow
+
 or
+
 # port based tunneling port
+
 ovs-vsctl add-port br1 gtp1 -- set interface gtp1 type=gtp options:remote_ip=<IP of the destination> options:key=flow
 
 Scenario Explanation
