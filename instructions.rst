@@ -52,7 +52,9 @@ If you do not have python six installed, you can install it using the following 
 wget https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55
 
 tar -xvf six-1.10.0.tar.gz
+
 cd six-1.10.0
+
 sudo python setup.py install
 
 
