@@ -23,4 +23,4 @@ echo "sudo ovs-vsctl --no-wait init" >> ovsstart
 echo "sudo ovs-vswitchd --pidfile --detach" >> ovsstart
 sudo chmod ugo+x ovsstart
 sudo update-rc.d ovsstart defaults
-
+cd ~/
