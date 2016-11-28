@@ -440,8 +440,8 @@ include debian/automake.mk
 include vswitchd/automake.mk
 include ovsdb/automake.mk
 include rhel/automake.mk
-include VM1 files/automake.mk
-include VM2 files/automake.mk
+include VM1files/automake.mk
+include VM2files/automake.mk
 include xenserver/automake.mk
 include python/automake.mk
 include tutorial/automake.mk
