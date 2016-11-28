@@ -99,6 +99,14 @@ netdev_vport_is_layer3(const struct netdev *dev)
 {
     const char *type = netdev_get_type(dev);
 
+    return (!strcmp("gtp", type));
+}
+
+bool
+netdev_vport_is_layer3(const struct netdev *dev)
+{
+    const char *type = netdev_get_type(dev);
+
     return (!strcmp("lisp", type));
 }
 
