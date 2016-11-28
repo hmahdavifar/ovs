@@ -89,6 +89,7 @@ docs = \
 	IntegrationGuide.rst \
 	MAINTAINERS.rst \
 	OPENFLOW.rst \
+	instructions.rst \
 	PORTING.rst \
 	README.rst \
 	README-lisp.rst \
