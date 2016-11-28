@@ -1,6 +1,3 @@
-sudo apt-get -y install git wget dh-autoreconf libssl-dev libtool libc6-dev
-git clone https://github.com/ashishkurian/ovs.git
-cd ovs
 sudo ./boot.sh
 sudo ./configure --with-linux=/lib/modules/`uname -r`/build
 sudo make
@@ -15,3 +12,15 @@ sudo mkdir -p /usr/local/var/run/openvswitch
 sudo ovsdb-server --remote=punix:/usr/local/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --private-key=db:Open_vSwitch,SSL,private_key --certificate=db:Open_vSwitch,SSL,certificate --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --pidfile --detach
 sudo ovs-vsctl --no-wait init
 sudo ovs-vswitchd --pidfile --detach
+#Following is to automate the ovs-db starting on every reboot
+#not shown in OVS github
+cd ~/
+cd /etc/init.d
+sudo su
+echo "#! /bin/sh" >> ovsstart
+echo "sudo ovsdb-server --remote=punix:/usr/local/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --private-key=db:Open_vSwitch,SSL,private_key --certificate=db:Open_vSwitch,SSL,certificate --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --pidfile --detach" >> ovsstart
+echo "sudo ovs-vsctl --no-wait init" >> ovsstart
+echo "sudo ovs-vswitchd --pidfile --detach" >> ovsstart
+sudo chmod ugo+x ovsstart
+sudo update-rc.d ovsstart defaults
+
