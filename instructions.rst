@@ -91,6 +91,142 @@ If you look into the files, you can understand the working.
 
 The VMs should be setup in such a way that you can ping one VM from the other.In this particular scenario VM1 is having an
 ethernet port eth1 with IP address 192.168.56.101 and VM2 is having an ethernet port eth1 with IP address 192.168.56.103.
+
+
+The following python script can be run on VM1 to setup the gtp port and mininet topology.
+
+
+
+# -*- coding: utf-8 -*-
+from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.log import setLogLevel, info
+from mininet.node import OVSController, RemoteController,Node
+from mininet.cli import CLI
+
+class SimplePktSwitch(Topo):
+    """Simple topology example."""
+
+    def __init__(self, **opts):
+        """Create custom topo."""
+	import os
+	os.system ('sudo mn -c')
+        # Initialize topology
+        # It uses the constructor for the Topo cloass
+        super(SimplePktSwitch, self).__init__(**opts)
+
+        # Add hosts and switches
+        h1 = self.addHost('h1', ip='10.0.0.1',mac='00:00:00:00:00:01')
+        h2 = self.addHost('h2', ip='10.0.0.2',mac='00:00:00:00:00:02')
+
+	
+        # Adding switches
+        s1 = self.addSwitch('s1')
+
+        # Add links
+        self.addLink(h1, s1)
+        self.addLink(h2, s1)
+
+	
+
+def run():
+    net = Mininet(topo=SimplePktSwitch(),controller=OVSController)
+    net.start()
+
+    import os
+   
+    os.system ('sudo ovs-vsctl add-port s1 gtp1 -- set interface gtp1 type=gtp option:remote_ip=192.168.56.103 option:key=flow ofport_request=10')
+    os.system ('sudo ovs-ofctl add-flows s1 VM1flow.txt') 
+    os.system ('sudo ovs-vsctl add-port s1 eth1')
+    os.system ('sudo ifconfig eth1 0.0.0.0')
+    os.system ('sudo ifconfig s1 192.168.56.101')  	
+    
+    CLI(net)
+    net.stop()
+
+# if the script is run directly (sudo custom/optical.py):
+if __name__ == '__main__':
+    setLogLevel('info')
+run()
+
+
+
+The content of VM1flow.txt should be as
  
+
+table=0,dl_type=0x0800,dl_dst=06:00:00:00:00:00,tun_id=0x1,action=mod_dl_dst:00:00:00:00:00:01,output:1
+table=0,dl_type=0x0800,dl_dst=06:00:00:00:00:00,tun_id=0x2,action=mod_dl_dst:00:00:00:00:00:02,output:2
+table=0,in_port=1,dl_type=0x0800,action=set_field:192.168.56.103->tun_dst,set_field:0x1->tun_id,output:10
+table=0,in_port=2,dl_type=0x0800,action=set_field:192.168.56.103->tun_dst,set_field:0x2->tun_id,output:10
+
+
+table=0,dl_type=0x0806,action=NORMAL
+
  
+ The following python script can be run on VM2 to setup the gtp port and mininet topology.
+
+
+from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.log import setLogLevel, info
+from mininet.node import OVSController, RemoteController,Node
+from mininet.cli import CLI
+
+class SimplePktSwitch(Topo):
+    """Simple topology example."""
+
+    def __init__(self, **opts):
+        """Create custom topo."""
+	import os
+	os.system ('sudo mn -c')
+        # Initialize topology
+        # It uses the constructor for the Topo cloass
+        super(SimplePktSwitch, self).__init__(**opts)
+
+        # Add hosts and switches
+        h3 = self.addHost('h3', ip='10.0.0.3',mac='00:00:00:00:00:03')
+        h4 = self.addHost('h4', ip='10.0.0.4',mac='00:00:00:00:00:04')
+   	
+        # Adding switches
+        s2 = self.addSwitch('s2')
+
+        # Add links
+        self.addLink(h3, s2)
+        self.addLink(h4, s2)
+
+	
+
+def run():
+    net = Mininet(topo=SimplePktSwitch(),controller=OVSController)
+    net.start()
+
+    import os
+
+    
+    os.system ('sudo ovs-vsctl add-port s2 gtp2 -- set interface gtp2 type=gtp option:remote_ip=192.168.56.101 option:key=flow ofport_request=10')
+    os.system ('sudo ovs-ofctl add-flows s2 VM2flow.txt')
+    os.system ('sudo ovs-vsctl add-port s2 eth1')
+    os.system ('sudo ifconfig eth1 0.0.0.0')
+    os.system ('sudo ifconfig s2 192.168.56.103')
+    CLI(net)
+    net.stop()
+
+# if the script is run directly (sudo custom/optical.py):
+if __name__ == '__main__':
+    setLogLevel('info')
+run()
+
+
+The content of VM2flow.txt should be as
+
+
+table=0,dl_type=0x0800,dl_dst=06:00:00:00:00:00,tun_id=0x1,action=mod_dl_dst:00:00:00:00:00:03,output:1
+table=0,dl_type=0x0800,dl_dst=06:00:00:00:00:00,tun_id=0x2,action=mod_dl_dst:00:00:00:00:00:04,output:2
+table=0,dl_type=0x0800,in_port=1,dl_type=0x0800,action=set_field:192.168.56.101->tun_dst,set_field:0x1->tun_id,output:10
+table=0,dl_type=0x0800,in_port=2,dl_type=0x0800,action=set_field:192.168.56.101->tun_dst,set_field:0x2->tun_id,output:10
+
+
+
+table=0,dl_type=0x0806,action=NORMAL
+
 
