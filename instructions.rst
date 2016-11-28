@@ -38,14 +38,13 @@ Ethernet headers, and ARP requests shouldn't be sent over the tunnel. Because of
 there are some additional steps required for setting up GTP tunnels in Open vSwitch, 
 until support for L3 tunnels will improve. This can be understood from the flow rules.
 
-There is an installation script included in the repository. You need to install the 
-dependencies by the following command
+There is an installation script included in the repository which can automate the installation.
+
+Before that you need to install the dependencies by the following command
 
 sudo apt-get -y install git wget dh-autoreconf libssl-dev libtool libc6-dev
 
-To install mininet : apt-get install mininet
-
-Ensure that you have python >2.7 installed on your machine 
+Ensure that you have python >2.7 installed on your machine (by default python is > 2.7 on Ubuntu 16)
 
 If you do not have python six installed, you can install it using the following commands
 
@@ -56,6 +55,10 @@ tar -xvf six-1.10.0.tar.gz
 cd six-1.10.0
 
 sudo python setup.py install
+
+After the OVS is installed, you can install mininet using
+
+apt-get install mininet
 
 
 Setting up the GTP port
