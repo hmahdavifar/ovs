@@ -50,7 +50,7 @@ apt-get install mininet
 
 
 Setting up the GTP port on OVS
----------------------
+------------------------------
 
 ovs-vsctl add-br br1
 
@@ -66,7 +66,7 @@ or
 ovs-vsctl add-port br1 gtp1 -- set interface gtp1 type=gtp options:remote_ip=<IP of the destination> options:key=flow
 
 Scenario Explanation
-------------------------------
+--------------------
 
 In the example scenario we have two virtual machines(VM1 & VM2) with mininet installed on both of them. We have
 two hosts attached on each of the VMs. VM1 has hosts H1 and H2 and VM2 has hosts H3 and H4. Tunneling is enabled
@@ -82,9 +82,13 @@ The following python script can be run on VM1 to setup the gtp port and mininet 
 
 
 from mininet.topo import Topo
+
 from mininet.net import Mininet
+
 from mininet.log import setLogLevel, info
+
 from mininet.node import OVSController, RemoteController,Node
+
 from mininet.cli import CLI
 
 class SimplePktSwitch(Topo):
