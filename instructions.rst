@@ -89,6 +89,8 @@ also provided which adds the flow rules on each of these VMs. You have to run th
 automatically add the mininet topology and the flows. The script also configures the GTP port on the VMS automatically.
 If you look into the files, you can understand the working.
 
-The VMs should be setup in such a way that you can ping one VM from the other.
+The VMs should be setup in such a way that you can ping one VM from the other.In this particular scenario VM1 is having an
+ethernet port eth1 with IP address 192.168.56.101 and VM2 is having an ethernet port eth1 with IP address 192.168.56.103.
+ 
  
 
