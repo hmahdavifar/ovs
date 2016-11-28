@@ -248,7 +248,7 @@ check-kernel: all
 # Testing the out of tree Kernel module
 check-kmod: all
 	$(MAKE) modules_install
-	modprobe -r -a vport-geneve vport-gre vport-lisp vport-stt vport-vxlan openvswitch
+	modprobe -r -a vport-geneve vport-gre vport-lisp vport-gtp vport-stt vport-vxlan openvswitch
 	$(MAKE) check-kernel
 
 check-system-userspace: all
