@@ -25,22 +25,13 @@
 Description
 =================
 
-This fork of the master branch of OVS supports GTP-U tunneling. It takes care only of
-the mandatory part of the GTP-U tunneling. This tunneling is similar to the other layer
-3 tunneling - lisp. Similar to the case with lisp tunneling,  The GTP tunneling code 
-attaches a header with harcoded source and destination MAC address 06:00:00:00:00:00. 
-This address has all bits set to 0, except the locally administered bit, in order to 
-avoid potential collisions with existing allocations. In order for packets to reach 
-their intended destination, the destination MAC address needs to be rewritten.
+This fork of the master branch of OVS supports GTP-U tunneling. It takes care only of the mandatory part of the GTP-U tunneling. This tunneling is similar to the other layer 3 tunneling - lisp. Similar to the case with lisp tunneling,  The GTP tunneling code attaches a header with harcoded source and destination MAC address 06:00:00:00:00:00. This address has all bits set to 0, except the locally administered bit, in order to avoid potential collisions with existing allocations. In order for packets to reach their intended destination, the destination MAC address needs to be rewritten.
 
-GTP is a layer 3 tunneling mechanism, meaning that encapsulated packets do not carry 
-Ethernet headers, and ARP requests shouldn't be sent over the tunnel. Because of this, 
-there are some additional steps required for setting up GTP tunnels in Open vSwitch, 
-until support for L3 tunnels will improve. This can be understood from the flow rules.
+GTP is a layer 3 tunneling mechanism, meaning that encapsulated packets do not carry Ethernet headers, and ARP requests shouldn't be sent over the tunnel. Because of this, there are some additional steps required for setting up GTP tunnels in Open vSwitch, until support for L3 tunnels will improve. This can be understood from the flow rules given in the following section.
 
-There is an installation script included in the repository which can automate the installation.
+There is an installation script install.sh, included in the repository which can automate the installation of OVS on your machine
 
-Before that you need to install the dependencies by the following command
+Before that you need to install the dependencies by the following command :
 
 sudo apt-get -y install git wget dh-autoreconf libssl-dev libtool libc6-dev
 
@@ -49,11 +40,8 @@ Ensure that you have python >2.7 installed on your machine (by default python is
 If you do not have python six installed, you can install it using the following commands
 
 wget https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55
-
 tar -xvf six-1.10.0.tar.gz
-
 cd six-1.10.0
-
 sudo python setup.py install
 
 After the OVS is installed, you can install mininet using
@@ -61,7 +49,7 @@ After the OVS is installed, you can install mininet using
 apt-get install mininet
 
 
-Setting up the GTP port
+Setting up the GTP port on OVS
 ---------------------
 
 ovs-vsctl add-br br1
@@ -81,23 +69,18 @@ Scenario Explanation
 ------------------------------
 
 In the example scenario we have two virtual machines(VM1 & VM2) with mininet installed on both of them. We have
-two hosts attached on each of the VMs. VM1 has hosts H1 and H2 and VM2 has hosts H3 and H4. Tunneling is enalbled
+two hosts attached on each of the VMs. VM1 has hosts H1 and H2 and VM2 has hosts H3 and H4. Tunneling is enabled
 between H1 and H3 & between H2 and H4.
 
-A mininet topology is also started on each of the VMs using the topology python script. A flow.txt file is 
-also provided which adds the flow rules on each of these VMs. You have to run the corresponding python file to
-automatically add the mininet topology and the flows. The script also configures the GTP port on the VMS automatically.
-If you look into the files, you can understand the working.
+A mininet topology is also started on each of the VMs using the python script given in the following sections. A flow.txt file is also provided which adds the flow rules on each of these VMs. You have to run the corresponding python file to
+automatically add the mininet topology and the flows. The script also configures the GTP port on the VMS automatically so that you do not have to explicitly set up GTP ports as explained in the above section. If you look into the files, you can understand the working.
 
-The VMs should be setup in such a way that you can ping one VM from the other.In this particular scenario VM1 is having an
-ethernet port eth1 with IP address 192.168.56.101 and VM2 is having an ethernet port eth1 with IP address 192.168.56.103.
+The VMs should be setup in such a way that you can ping one VM from the other. This you need to setup while configuring your machines. There are youtube videos showing how to connect two VMs and establish ping between them. In this particular scenario VM1 is having an ethernet port eth1 with IP address 192.168.56.101 and VM2 is having an ethernet port eth1 with IP address 192.168.56.103.
 
 
 The following python script can be run on VM1 to setup the gtp port and mininet topology.
 
 
-
-# -*- coding: utf-8 -*-
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.log import setLogLevel, info
@@ -115,7 +98,7 @@ class SimplePktSwitch(Topo):
         # It uses the constructor for the Topo cloass
         super(SimplePktSwitch, self).__init__(**opts)
 
-        # Add hosts and switches
+        # Add hosts and setting mac and ip addresses
         h1 = self.addHost('h1', ip='10.0.0.1',mac='00:00:00:00:00:01')
         h2 = self.addHost('h2', ip='10.0.0.2',mac='00:00:00:00:00:02')
 
@@ -136,7 +119,8 @@ def run():
     import os
    
     os.system ('sudo ovs-vsctl add-port s1 gtp1 -- set interface gtp1 type=gtp option:remote_ip=192.168.56.103 option:key=flow ofport_request=10')
-    os.system ('sudo ovs-ofctl add-flows s1 VM1flow.txt') 
+    os.system ('sudo ovs-ofctl add-flows s1 VM1flow.txt')
+    # following commands are to connect eth1 to the OVS to enable comm between VMs directly
     os.system ('sudo ovs-vsctl add-port s1 eth1')
     os.system ('sudo ifconfig eth1 0.0.0.0')
     os.system ('sudo ifconfig s1 192.168.56.101')  	
@@ -159,7 +143,7 @@ table=0,dl_type=0x0800,dl_dst=06:00:00:00:00:00,tun_id=0x2,action=mod_dl_dst:00:
 table=0,in_port=1,dl_type=0x0800,action=set_field:192.168.56.103->tun_dst,set_field:0x1->tun_id,output:10
 table=0,in_port=2,dl_type=0x0800,action=set_field:192.168.56.103->tun_dst,set_field:0x2->tun_id,output:10
 
-
+# taking care of arp requests as this should not pass through the tunnel
 table=0,dl_type=0x0806,action=NORMAL
 
  
@@ -183,7 +167,7 @@ class SimplePktSwitch(Topo):
         # It uses the constructor for the Topo cloass
         super(SimplePktSwitch, self).__init__(**opts)
 
-        # Add hosts and switches
+        # Add hosts and setting IP and mac addresses
         h3 = self.addHost('h3', ip='10.0.0.3',mac='00:00:00:00:00:03')
         h4 = self.addHost('h4', ip='10.0.0.4',mac='00:00:00:00:00:04')
    	
@@ -205,6 +189,7 @@ def run():
     
     os.system ('sudo ovs-vsctl add-port s2 gtp2 -- set interface gtp2 type=gtp option:remote_ip=192.168.56.101 option:key=flow ofport_request=10')
     os.system ('sudo ovs-ofctl add-flows s2 VM2flow.txt')
+    # following commands are to connect eth1 to the OVS to enable comm between VMs directly
     os.system ('sudo ovs-vsctl add-port s2 eth1')
     os.system ('sudo ifconfig eth1 0.0.0.0')
     os.system ('sudo ifconfig s2 192.168.56.103')
