@@ -17,11 +17,12 @@ sudo ovs-vswitchd --pidfile --detach
 #not shown in OVS github
 cd ~/
 cd /etc/init.d
-sudo su
+sudo su <<HERE
 echo "#! /bin/sh" >> ovsstart
 echo "sudo ovsdb-server --remote=punix:/usr/local/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --private-key=db:Open_vSwitch,SSL,private_key --certificate=db:Open_vSwitch,SSL,certificate --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --pidfile --detach" >> ovsstart
 echo "sudo ovs-vsctl --no-wait init" >> ovsstart
 echo "sudo ovs-vswitchd --pidfile --detach" >> ovsstart
 sudo chmod ugo+x ovsstart
 sudo update-rc.d ovsstart defaults
+HERE
 cd ~/
