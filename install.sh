@@ -1,3 +1,4 @@
+sudo apt-get -y install git wget dh-autoreconf libssl-dev libtool libc6-dev
 sudo ./boot.sh
 sudo ./configure --with-linux=/lib/modules/`uname -r`/build
 sudo make
