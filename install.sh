@@ -5,7 +5,7 @@ sudo make
 sudo make install
 sudo cp datapath/linux/openvswitch.ko /lib/modules/`uname -r`/kernel/net/openvswitch/openvswitch.ko
 sudo make modules_install
-/sbin/modprobe openvswitch
+sudo /sbin/modprobe openvswitch
 /sbin/lsmod
 sudo mkdir -p /usr/local/etc/openvswitch
 sudo ovsdb-tool create /usr/local/etc/openvswitch/conf.db vswitchd/vswitch.ovsschema
