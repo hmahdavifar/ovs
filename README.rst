@@ -191,5 +191,6 @@ The content of VM2flow.txt should be as::
 	table=0,dl_type=0x0800,in_port=2,dl_type=0x0800,action=set_field:192.168.56.101->tun_dst,set_field:0x2->tun_id,output:10
 	# Normal action for all other flows. This ensures that arp is not forwarded through the tunnel
 	table=0,dl_type=0x0806,action=NORMAL
+If everything was configured correctly, you must be able to ping H3 from H1 and vice versa. Also the ping should succeed from H2 to H4 and vice versa. You can change the configurations on the scripts to change the IP, MAC addresses and other parameters.
 
 
