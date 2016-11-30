@@ -27,33 +27,28 @@ Description
 
 This fork of the master branch of OVS supports GTP-U tunneling. It takes care only of the mandatory part of the GTP-U tunneling. This tunneling is similar to the other layer 3 tunneling - lisp. Similar to the case with lisp tunneling,  The GTP tunneling code attaches a header with harcoded source and destination MAC address 06:00:00:00:00:00. This address has all bits set to 0, except the locally administered bit, in order to avoid potential collisions with existing allocations. In order for packets to reach their intended destination, the destination MAC address needs to be rewritten.
 
-GTP is a layer 3 tunneling mechanism, meaning that encapsulated packets do not carry Ethernet headers, and ARP requests shouldn't be sent over the tunnel. Because of this, there are some additional steps required for setting up GTP tunnels in Open vSwitch, until support for L3 tunnels will improve. This can be understood from the flow rules given in the following section.
+GTP is a layer 3 tunneling mechanism, meaning that encapsulated packets do not carry Ethernet headers, and ARP requests shouldn't be sent over the tunnel. Because of this, there are some additional steps required for setting up GTP tunnels in Open vSwitch, until support for L3 tunnels will improve. This can be understood from the flow rules given in the following sections.
 
-There is an installation script install.sh, included in the repository which can automate the installation of OVS on your machine
+There is an installation script *install.sh* included in the repository which can automate the installation of OVS on your machine along with the dependencies. Alternatively you can install the dependencies by the following command
 
-Before that you need to install the dependencies by the following command :
+*sudo apt-get -y install git wget dh-autoreconf libssl-dev libtool libc6-dev*
 
-sudo apt-get -y install git wget dh-autoreconf libssl-dev libtool libc6-dev
+Before installing OVS ensure that you have python2.7 or any later version installed on your machine (by default python is > 2.7 on Ubuntu 16) and python six module is also installed.If you do not have python six installed, you can install it by the following commands
 
-Ensure that you have python >2.7 installed on your machine (by default python is > 2.7 on Ubuntu 16)
+*wget https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55*
+*tar -xvf six-1.10.0.tar.gz*
+*cd six-1.10.0*
+*sudo python setup.py install*
 
-If you do not have python six installed, you can install it using the following commands
+After the OVS is installed, you can install mininet by the following command. Installing mininet is optional. In my scenario I am using mininet to simulate a virtual topology and demonstrate GTP-U tunneling.
 
-wget https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55
-tar -xvf six-1.10.0.tar.gz
-cd six-1.10.0
-sudo python setup.py install
-
-After the OVS is installed, you can install mininet using
-
-apt-get install mininet
+*apt-get install mininet*
 
 
-Setting up the GTP port on OVS
-------------------------------
+Setting up the GTP tunneling port on OVS ::
+-----------------------------------------
 
-ovs-vsctl add-br br1
-
+``*ovs-vsctl add-br br1*``
 
 # flow based tunneling port
 
