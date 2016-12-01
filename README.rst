@@ -44,6 +44,10 @@ After the OVS is installed, you can install mininet by the following command. In
 
 ``$ apt-get install mininet``
 
+After mininet is installed, the following command will add the ovs-testcontoller as the OVSController for mininet
+
+``$ cp ovs/utilities/ovs-testcontroller /usr/bin/ovs-controller``
+
 
 Setting up the GTP tunneling port on OVS ::
 -----------------------------------------
