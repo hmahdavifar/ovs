@@ -330,6 +330,13 @@ netdev_tx_t rpl_gtp_xmit(struct sk_buff *skb)
         err = -EINVAL;
         goto error;
     }
+	
+	
+    sock = rcu_dereference(gtp_dev->sock);
+    if (!sock) {
+		err = -EIO;
+                goto error;
+    }	    
 
     if (skb->protocol != htons(ETH_P_IP) &&
         skb->protocol != htons(ETH_P_IPV6)) {
