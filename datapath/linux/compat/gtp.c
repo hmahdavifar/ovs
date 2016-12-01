@@ -369,13 +369,14 @@ netdev_tx_t rpl_gtp_xmit(struct sk_buff *skb)
     skb_pull(skb, network_offset);
     skb_reset_mac_header(skb);
     skb->vlan_tci=0;
+	
+	
+    if (skb_is_gso(skb) && skb_is_encapsulated(skb))
+		goto err_free_rt;
 
     skb = __udp_tunnel_handle_offloads(skb, false);
-    if (IS_ERR(skb)) {
-        err = PTR_ERR(skb);
-        skb = NULL;
-        goto err_free_rt;
-    }
+    if (!skb)
+            return NETDEV_TX_OK;
 
     src_port = htons(get_src_port(net, skb));
     dst_port = gtp_dev->dst_port;
@@ -415,26 +416,6 @@ static void gtp_uninit(struct net_device *dev)
 	free_percpu(dev->tstats);
 }
 
-
-
-#ifdef HAVE_DEV_TSTATS
-/* Setup stats when device is created */
-static int gtp_init(struct net_device *dev)
-{
-    dev->tstats = (typeof(dev->tstats))
-                  netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
-    if (!dev->tstats)
-        return -ENOMEM;
-
-    return 0;
-}
-
-static void gtp_uninit(struct net_device *dev)
-{
-    free_percpu(dev->tstats);
-}
-#endif
-
 static struct socket *create_sock(struct net *net, bool ipv6,
                                   __be16 port)
 {
@@ -466,11 +447,13 @@ static int gtp_open(struct net_device *dev)
     struct gtp_dev *gtp = netdev_priv(dev);
     struct udp_tunnel_sock_cfg tunnel_cfg;
     struct net *net = gtp->net;
+    struct socket *sock;
 
-    gtp->sock = create_sock(net, false, gtp->dst_port);
+    sock = create_sock(net, false, gtp->dst_port);
     if (IS_ERR(gtp->sock))
         return PTR_ERR(gtp->sock);
-
+	
+    rcu_assign_pointer(gtp->sock, sock);
     /* Mark socket as an encapsulation socket */
     tunnel_cfg.sk_user_data = dev;
     tunnel_cfg.encap_type = 1;
@@ -483,10 +466,17 @@ static int gtp_open(struct net_device *dev)
 static int gtp_stop(struct net_device *dev)
 {
     struct gtp_dev *gtp = netdev_priv(dev);
+    struct socket *socket;
 
-    udp_tunnel_sock_release(gtp->sock);
-    gtp->sock = NULL;
-    return 0;
+	socket = rtnl_dereference(gtp->sock);
+	if (!socket)
+		return 0;
+
+	rcu_assign_pointer(gtp->sock, NULL);
+
+	synchronize_net();
+	udp_tunnel_sock_release(socket);
+        return 0;
 }
 
 static netdev_tx_t gtp_dev_xmit(struct sk_buff *skb, struct net_device *dev)
@@ -651,6 +641,10 @@ static int gtp_configure(struct net *net, struct net_device *dev,
 
     if (find_dev(net, dst_port))
         return -EBUSY;
+	
+    err = gtp_change_mtu(dev, GTP_MAX_MTU);
+	if (err)
+               return err;	
 
     err = register_netdevice(dev);
     if (err)
@@ -804,6 +798,7 @@ int rpl_gtp_init_module(void)
 out2:
     unregister_pernet_subsys(&gtp_net_ops);
 out1:
+    pr_err("Error while initializing LISP %d\n", rc);	
     return rc;
 }
 
