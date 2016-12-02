@@ -115,8 +115,8 @@ The following python script can be run on VM1 to setup the gtp port and mininet 
 	    os.system ('sudo ovs-vsctl add-port s1 gtp1 -- set interface gtp1 type=gtp option:remote_ip=192.168.56.103 option:key=flow ofport_request=10')
 	    os.system ('sudo ovs-ofctl add-flows s1 VM1flow.txt')
 	    # following commands are to connect eth1 to the OVS to enable communication between VMs directly
-	    os.system ('sudo ovs-vsctl add-port s1 eth1')
-	    os.system ('sudo ifconfig eth1 0.0.0.0')
+	    os.system ('sudo ovs-vsctl add-port s1 enp0s8')
+	    os.system ('sudo ifconfig enp0s8 0.0.0.0')
 	    os.system ('sudo ifconfig s1 192.168.56.101')
 
 	    CLI(net)
@@ -145,9 +145,9 @@ The following python script can be run on VM2 to setup the gtp port and mininet 
 	from mininet.cli import CLI
 
 	class SimplePktSwitch(Topo):
-    	"""Simple topology example."""
+    	    """Simple topology example."""
 
-    		def __init__(self, **opts):
+    	    def __init__(self, **opts):
         	"""Create custom topo."""
 		import os
 		os.system ('sudo mn -c')
@@ -167,18 +167,18 @@ The following python script can be run on VM2 to setup the gtp port and mininet 
         	self.addLink(h4, s2)
 
 	def run():
-    	net = Mininet(topo=SimplePktSwitch(),controller=OVSController)
-    	net.start()
-    	import os
-	# command to setup tunneling port from terminal.
-    	os.system ('sudo ovs-vsctl add-port s2 gtp2 -- set interface gtp2 type=gtp option:remote_ip=192.168.56.101 option:key=flow ofport_request=10')
-    	os.system ('sudo ovs-ofctl add-flows s2 VM2flow.txt')
-    	# following commands are to connect eth1 to the OVS to enable communication between VMs directly
-    	os.system ('sudo ovs-vsctl add-port s2 eth1')
-    	os.system ('sudo ifconfig eth1 0.0.0.0')
-    	os.system ('sudo ifconfig s2 192.168.56.103')
-    	CLI(net)
-    	net.stop()
+    	    net = Mininet(topo=SimplePktSwitch(),controller=OVSController)
+    	    net.start()
+    	    import os
+	    # command to setup tunneling port from terminal.
+    	    os.system ('sudo ovs-vsctl add-port s2 gtp2 -- set interface gtp2 type=gtp option:remote_ip=192.168.56.101 option:key=flow ofport_request=10')
+    	    os.system ('sudo ovs-ofctl add-flows s2 VM2flow.txt')
+    	    # following commands are to connect eth1 to the OVS to enable communication between VMs directly
+    	    os.system ('sudo ovs-vsctl add-port s2 eth1')
+    	    os.system ('sudo ifconfig eth1 0.0.0.0')
+    	    os.system ('sudo ifconfig s2 192.168.56.103')
+    	    CLI(net)
+    	    net.stop()
 
 	# if the script is run directly (sudo custom/optical.py):
 	if __name__ == '__main__':
@@ -194,5 +194,7 @@ The content of VM2flow.txt should be as::
 	# Normal action for all other flows. This ensures that arp is not forwarded through the tunnel
 	table=0,dl_type=0x0806,action=NORMAL
 If everything was configured correctly, you must be able to ping H3 from H1 and vice versa. Also the ping should succeed from H2 to H4 and vice versa. You can change the configurations on the scripts to change the IP, MAC addresses and other parameters.
+
+Eg: H1 ping 10.0.0.3
 
 
