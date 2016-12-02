@@ -200,10 +200,12 @@ Eg: H1 ping 10.0.0.3
 To setup the networking between the VMs, I used following setup in the interfaces files under /etc/network/interfaces on VM1::
 
 	auto lo enp0s3
+	# enp0s3 is the NAT adapter
 	iface lo inet loopback
 	iface enp0s3 inet dhcp
 
 	auto enp0s8
+	# enp0s8 is the internal network adapter
 	iface enp0s8 inet static
 	address 192.168.56.103
 	netmask 255.255.255.0
